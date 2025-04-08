@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма Авторизации/Регистрации</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #7f7fd5, #86a8e7);
+            overflow: hidden;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            padding: 30px;
+            text-align: center;
+            transition: background-color 0.3s, transform 0.3s;
+            position: relative;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: #86a8e7;
+            outline: none;
+        }
+
+        button {
+            background-color: #7f7fd5;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #6b6e9c;
+            transform: scale(1.05);
+        }
+
+        .toggle {
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* Стиль для изображения */
+        .bear-img {
+            width: 80px; /* Установите желаемую ширину */
+            margin-bottom: 20px; /* Отступ от заголовка */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="container">
+    <img src="images/1.png" alt="Медведь" class="bear-img">
+    <h2 id="formTitle">Авторизация</h2>
+    <form id="authForm">
+        <div class="input-group">
+            <input type="text" placeholder="Логин" required>
+        </div>
+        <div class="input-group">
+            <input type="password" placeholder="Пароль" required>
+        </div>
+        <button type="submit">Войти</button>
+    </form>
+    <div class="toggle" id="toggleLink">Нет аккаунта? Зарегистрируйтесь</div>
+</div>
+
+<script>
+    const toggleLink = document.getElementById('toggleLink');
+    const authForm = document.getElementById('authForm');
+    const formTitle = document.getElementById('formTitle');
+    const container = document.getElementById('container');
+
+    toggleLink.addEventListener('click', () => {
+        if (formTitle.innerText === 'Авторизация') {
+            formTitle.innerText = 'Регистрация';
+            toggleLink.innerText = 'Уже есть аккаунт? Войдите';
+            authForm.innerHTML = `
+                <div class="input-group">
+                    <input type="text" placeholder="Логин" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Пароль" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" placeholder="Email" required>
+                </div>
+                <button type="submit">Зарегистрироваться</button>
+            `;
+        } else {
+            formTitle.innerText = 'Авторизация';
+            toggleLink.innerText = 'Нет аккаунта? Зарегистрируйтесь';
+            authForm.innerHTML = `
+                <div class="input-group">
+                    <input type="text" placeholder="Логин" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Пароль" required>
+                </div>
+                <button type="submit">Войти</button>
+            `;
+        }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        const red = Math.round((x / width) * 255);
+        const green = Math.round((y / height) * 255);
+        const blue = 150;
+
+        container.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+
+        // Добавляем эффект смещения
+        const moveX = (x - width / 2) / 20;
+        const moveY = (y - height / 2) / 20;
+        container.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    });
+
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(authForm);
+        const data = Object.fromEntries(formData);
+
+        const endpoint = formTitle.innerText === 'Регистрация' ? '/register' : '/login';
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('Успех:', responseData);
+            alert('Успешно выполнено!');
+        } else {
+            const errorText = await response.text();
+            alert('Ошибка: ' + errorText);
+        }
+    });
+</script>
+
+</body>
+</html>
